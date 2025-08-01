@@ -62,6 +62,11 @@ expiration_monitoring:
       # Allow overriding the default labels - must *update* the existing defaults (optional)
       prometheus_labels:
         environment: dev # Cannot add a key that doesn't already exist in the global configuration
+      # Only monitor secrets that explicitly opt-in via custom metadata.
+      # In this example, only secrets with `custom_metadata.monitor == "true"` will be included in the monitoring.
+      monitor_flag:
+        field: monitor
+        truthly_value: "true"
       secrets:
       - mount_point: secrets
         secret_path: expiration_secrets

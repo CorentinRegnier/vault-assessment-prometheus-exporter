@@ -69,8 +69,8 @@ class ExpirationMonitor(ABC):
         """
         Update the current value for the metrics.
         """
-
         expiration_info = self.get_expiration_info()
-
+        if expiration_info is None:
+            return
         self.secret_last_renewal_timestamp_gauge.labels(**self.prometheus_labels).set(expiration_info.get_last_renewal_timestamp())
         self.secret_expiration_timestamp_gauge.labels(**self.prometheus_labels).set(expiration_info.get_expiration_timestamp())

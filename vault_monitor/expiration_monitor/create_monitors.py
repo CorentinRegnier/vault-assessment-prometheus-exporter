@@ -28,6 +28,7 @@ def create_monitors(config: Dict, vault_client: hvac_client) -> Sequence[Expirat
         # Use deepcopy since dicts are handled by ref and tend to get overwritten otherwise
         service_prometheus_labels = deepcopy(default_prometheus_labels)
         service_prometheus_labels.update(service_config.get("prometheus_labels", {}))
+        monitor_flag = service_config.get("monitor_flag", None)
         if not check_prometheus_labels(prometheus_label_keys, service_prometheus_labels):
             raise ValueError(f"expiration_monitoring {service_config['name']} configures prometheus_labels with a key(s) which is not in the globally configured prometheus labels!")
         for secret in service_config.get("secrets", []):
@@ -49,6 +50,7 @@ def create_monitors(config: Dict, vault_client: hvac_client) -> Sequence[Expirat
                     service_config["name"],
                     service_prometheus_labels,
                     service_config.get("metadata_fieldnames", default_metadata_fieldnames),
+                    monitor_flag,
                 )
                 expiration_monitors.append(secret_monitor)
 
@@ -141,6 +143,17 @@ def get_configuration_schema() -> Dict:
                                 "dependencies": "^expiration_monitoring.prometheus_labels",
                                 "keysrules": {"type": "string", "forbidden": ["secret_path", "mount_point", "service"]},
                                 "meta": {"description": "Labels to set in the Prometheus metrics. All of the keys must already exist in the global prometheus_labels."},
+                            },
+                            "monitor_flag": {
+                                "type": "dict",
+                                "nullable": True,
+                                "schema": {
+                                    "field": {"type": "string"},
+                                    "truthy_value": {"type": "string"},
+                                },
+                                "meta": {
+                                    "description": "If set, only secrets with this custom_metadata key and matching value will be monitored."
+                                },
                             },
                             "secrets": {
                                 "type": "list",

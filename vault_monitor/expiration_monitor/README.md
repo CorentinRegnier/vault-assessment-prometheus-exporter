@@ -95,9 +95,10 @@ A service in this context is merely a logical grouping, and beyond the fact a `s
 Each service can contain the following:
 
 * `name` - the name of the service, this will be included as a label on the associated metrics
-* `prometheus_labels` (optional) - this key allows over ridding the "global" Prometheus labels. It cannot, however, add a new key.
+* `prometheus_labels` (optional) - this key allows overriding the "global" Prometheus labels. It cannot, however, add a new key.
 * `secrets` - this key maps to a list of secrets, see below for details for secret configuration
 * `metadata_fieldnames` (optional) - allows you to override the default/"global" values for the custom metadata fieldnames
+* `monitor_flag` (optional) - allows enabling monitoring **only** for secrets that explicitly have a certain metadata key set to a defined value
 
 #### Secret Configuration
 
@@ -110,3 +111,8 @@ Each service can contain the following:
 * `mount_point` - auth engine mount point
 * `entity_id` - the entity id to monitor
 * `entity_name` - a human readable name for the entity. This does not have to match the name used in Vault, as it is not used to look up the entity.
+
+#### Monitor flag Configuration
+
+* `field` - The name of the metadata key to check in `custom_metadata`. Monitoring will only be enabled for secrets where this key is present and matches the expected value.
+* `truthy_value` - The string value that the `field` must match to activate monitoring for a given secret. If the value differs or the key is absent, the secret is skipped.
